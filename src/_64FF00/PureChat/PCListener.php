@@ -8,6 +8,7 @@ use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\player\IPlayer;
 use pocketmine\player\Player;
+use pocketmine\player\chat\LegacyRawChatFormatter;
 
 class PCListener implements Listener
 {
@@ -70,6 +71,6 @@ class PCListener implements Listener
         $message = $event->getMessage();
         $WorldName = $this->plugin->getConfig()->get("enable-multiworld-chat") ? $player->getWorld()->getDisplayName() : null;
         $chatFormat = $this->plugin->getChatFormat($player, $message, $WorldName);
-        $event->setFormat($chatFormat);
+        $event->setFormatter(new LegacyRawChatFormatter($chatFormat));
     }
 }
