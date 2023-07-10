@@ -2,6 +2,8 @@
 
 namespace _64FF00\PureChat;
 
+use _64FF00\PureChat\factions\FactionsInterface;
+use _64FF00\PureChat\factions\PiggyFactions;
 use _64FF00\PurePerms\PPGroup;
 use _64FF00\PurePerms\PurePerms;
 use pocketmine\command\Command;
@@ -33,6 +35,8 @@ class PureChat extends PluginBase
 
     private PurePerms $purePerms;
 
+    private ?FactionsInterface $factionsAPI;
+
     public function onLoad(): void
     {
         $this->saveDefaultConfig();
@@ -51,6 +55,7 @@ class PureChat extends PluginBase
     
     public function onEnable(): void
     {
+        $this->loadFactionsPlugin();
         $this->getServer()->getPluginManager()->registerEvents(new PCListener($this), $this);
     }
 
@@ -145,10 +150,17 @@ class PureChat extends PluginBase
         $tempData = $this->config->getAll();
         $version = $this->getDescription()->getVersion();
         $tempData["version"] = $version;
+        if ($this->getConfig()->get("faction-support", true) === true) {            
+           if (!isset($tempData["default-factions-plugin"]))
+               $tempData["default-factions-plugin"] = null;
+        }
         {
             $tempData["enable-multiworld-chat"] = $tempData["enable-multiworld-support"];
             unset($tempData["enable-multiworld-support"]);
         }
+
+        if (isset($tempData["custom-no-fac-message"])) unset($tempData["custom-no-fac-message"]);
+        
         if(isset($tempData["groups"]))
         {
             foreach($tempData["groups"] as $groupName => $tempGroupData)
@@ -218,9 +230,32 @@ class PureChat extends PluginBase
         $string = str_replace("{FORMAT_ITALIC}", "&o", $string);
         $string = str_replace("{FORMAT_RESET}", "&r", $string);
         $string = str_replace("{world_name}", "{world}", $string);
+        $string = str_replace("{faction}", "fac_name}{fac_rank}", $string);
         $string = str_replace("{user_name}", "{display_name}", $string);
         $string = str_replace("{message}", "{msg}", $string);
         return $string;
+    }
+
+    private function loadFactionsPlugin(){
+        $factionsPluginName = $this->config->get("default-factions-plugin");
+
+        if ($factionsPluginName === null) {
+            $this->getLogger()->notice("No valid factions plugin in default-factions-plugin node was found. Disabling factions plugin support.");
+        } else {
+            switch (strtolower($factionsPluginName)) {
+                case "piggyfactions":
+                    if ($this->getServer()->getPluginManager()->getPlugin("PiggyFactions") !== null) {
+                        $this->factionsAPI = new PiggyFactions();
+                        $this->getLogger()->notice("PiggyFactions support enabled.");
+                        break;
+                    }
+                    $this->getLogger()->notice("PiggyFactions was not found. Disabling factions plugin support.");
+                    break;
+                default:
+                    $this->getLogger()->notice("No valid factions plugin in default-factions-plugin node was found. Disabling factions plugin support.");
+                    break;
+            }
+        }
     }
 
     /*
@@ -253,9 +288,15 @@ class PureChat extends PluginBase
         {
             $string = str_replace("{msg}", $this->stripColors($message), $string);
         }
-        {
-            $string = str_replace("{fac_name}", '', $string);
-            $string = str_replace("{fac_rank}", '', $string);
+        if ($this->getConfig()->get("faction-support", false) === true) {
+            $faction = $this->factionsAPI->getPlayerFaction($player);
+            if ($faction !== null) {
+               $string = str_replace("{fac_name}", $this->factionsAPI->getPlayerFaction($player), $string);
+               $string = str_replace("{fac_rank}", $this->factionsAPI->getPlayerRank($player), $string);
+            } else {
+               $string = str_replace("{fac_name}", '', $string);
+               $string = str_replace("{fac_rank}", '', $string);
+            }
         }
         $string = str_replace("{world}", ($WorldName === null ? "" : $WorldName), $string);
         $string = str_replace("{prefix}", $this->getPrefix($player, $WorldName), $string);
