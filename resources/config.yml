@@ -48,4 +48,7 @@ groups:
     chat: '&a[OP] &f[&e{fac_name&f] &{prefix}{display_name}{suffix} &c>&6> &f{msg}'
     nametag: '&a[OP] &b{display_name}'
     worlds: []
+  ACM:
+    nametag: '&b&l[ACM]&f&r [&e{fac_name}&f] {display_name}'
+    chat: '&8&l[ACM]&f&r {display_name} &7> {msg}'
 ...
