@@ -7,6 +7,11 @@
 # - string
 version: "1.4.10-7"
 
+# Enable or disable faction support
+# use "true" or "false"
+faction-support: true
+# PiggyFactions / null
+default-factions-plugin: PiggyFactions
 # Enable this if you want to use per-world chat formats / per-world nametags for players
 # - true / false
 enable-multiworld-chat: false
@@ -23,22 +28,24 @@ enable-multiworld-chat: false
 # {prefix} Get PurePerms Prefix of the rank.
 # {suffix} Get the PurePerms Suffix of the rank.
 # {world} Get the PurePerms world the player is in.
+# {fac_name} Get player's faction name.
+# {fac_rank} Get player's faction rank.
 
 groups:
   Guest:
-    chat: '&7[Guest] {display_name} &7> &f{msg}'
+    chat: '&7[Guest] &f[§e{fac_name}&f] {display_name} &7> &f{msg}'
     nametag: '&7[Guest] &f{display_name}'
     worlds: []
   Admin:
-    chat: '&c[Admin]  {display_name} &d>&b {msg}'
+    chat: '&c[Admin] &f[§e{fac_name&f] {display_name} &d>&b {msg}'
     nametag: '&a[Admin]&e &6{display_name}'
     worlds: []
   Owner:
-    chat: '&d[Owner]  &b{display_name} &c>&6> &b{msg}'
+    chat: '&d[Owner] &f[§e{fac_name}&f] &b{display_name} &c>&6> &b{msg}'
     nametag: '&d[Owner]&c &b{display_name}'
     worlds: []
   OP:
-    chat: '&a[OP] &{prefix}{display_name}{suffix} &c>&6> &f{msg}'
+    chat: '&a[OP] &f[&e{fac_name&f] &{prefix}{display_name}{suffix} &c>&6> &f{msg}'
     nametag: '&a[OP] &b{display_name}'
     worlds: []
 ...
