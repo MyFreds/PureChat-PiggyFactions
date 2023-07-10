@@ -39,3 +39,7 @@ See the available colour codes listed in the Config. Do not use colour codes in 
  - pchat.command.setprefix
  - pchat.command.setnametag
  - pchat.command.setformat
+
+# PurePerms
+
+Download [Here: PurePerms](https://github.com/AraaCuteUwU/PurePerms)
